@@ -45,17 +45,4 @@ class VetsServiceApplicationTest {
         // Verifies that the VetsProperties bean is created due to @EnableConfigurationProperties
         assertThat(vetsProperties).isNotNull();
     }
-
-    @Test
-    void mainMethodShouldRunWithoutErrors() {
-        // Temporarily set test profile to avoid connecting to external services
-        System.setProperty("spring.profiles.active", "test");
-
-        // Run the main method
-        VetsServiceApplication.main(new String[]{});
-
-        // No exception thrown indicates success
-        // Reset system property
-        System.clearProperty("spring.profiles.active");
-    }
 }

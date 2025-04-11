@@ -20,9 +20,11 @@ pipeline {
         stage('Determine changed services') {
             steps {
                 script {
+                    sh 'git fetch --all'
+
                     def changedFiles
                     if (env.CHANGE_TARGET) {  
-                        changedFiles = sh(returnStdout: true, script: "git diff --name-only origin/${env.CHANGE_TARGET}...HEAD").trim().split('\n')
+                        changedFiles = sh(returnStdout: true, script: "git diff --name-only origin/${env.CHANGE_TARGET}...${env.GIT_BRANCH}").trim().split('\n')
                     } else {  
                         changedFiles = sh(returnStdout: true, script: "git diff --name-only HEAD^ HEAD").trim().split('\n')
                     }

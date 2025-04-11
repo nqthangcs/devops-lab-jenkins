@@ -82,25 +82,6 @@ pipeline {
                 }
             }
         }
-
-        stage('Test') {
-            steps {
-                echo "Testing.."
-                script {
-                    def statusFile = 'status.txt'
-                    def statusContent = readFile(statusFile).trim() // Read file content and remove any surrounding whitespace
-
-                    if (statusContent == 'a') {
-                        echo "Content is 'a', proceeding with echo."
-                    } else if (statusContent == 'd') {
-                        error "Content is 'd', raising error."
-                    } else {
-                        echo "Content is neither 'a' nor 'd'."
-                    }
-                }
-            }
-        }
-
     }
 
     post {

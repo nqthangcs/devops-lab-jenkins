@@ -57,6 +57,7 @@ pipeline {
 
                         echo "Coverage for ${service}: ${coverage}%"
 
+                        // Optionally, you can fail the build if the coverage is too low
                         if (coverage < 70) {
                             error "Coverage is below 70% for ${service}!"
                         }
@@ -95,7 +96,7 @@ pipeline {
                     def response = sh(script: """
                         curl -X POST --user ${GITHUB_TOKEN} \
                             -H "Accept: application/vnd.github.v3+json" \
-                            https://api.github.com/repos/nqthangcs/aaa/statuses/${env.GIT_COMMIT} \
+                            https://api.github.com/repos/nqthangcs/devops-lab-jenkins/statuses/${env.GIT_COMMIT} \
                             -d '{"state": "success", "description": "Tests passed!", "context": "jenkins-ci"}'
                     """, returnStdout: true).trim()
 
@@ -115,7 +116,7 @@ pipeline {
                     def response = sh(script: """
                         curl -X POST --user ${GITHUB_TOKEN} \
                             -H "Accept: application/vnd.github.v3+json" \
-                            https://api.github.com/repos/nqthangcs/aaa/statuses/${env.GIT_COMMIT} \
+                            https://api.github.com/repos/nqthangcs/devops-lab-jenkins/statuses/${env.GIT_COMMIT} \
                             -d '{"state": "failure", "description": "Tests failed!", "context": "jenkins-ci"}'
                     """, returnStdout: true).trim()
 

@@ -20,23 +20,42 @@ pipeline {
         stage('Determine changed services') {
             steps {
                 script {
+                    // Ensure we have the latest from remote
+                    sh '''
+                        git config --global --add safe.directory "*"
+                        git fetch --all --prune
+                    '''
+
                     def changedFiles
-                    if (env.CHANGE_TARGET) {  
-                        changedFiles = sh(returnStdout: true, script: "git diff --name-only origin/${env.CHANGE_TARGET}...HEAD").trim().split('\n')
-                    } else {  
-                        changedFiles = sh(returnStdout: true, script: "git diff --name-only HEAD^ HEAD").trim().split('\n')
+                    try {
+                        if (env.CHANGE_TARGET) {
+                            // For pull requests
+                            sh "git rev-parse origin/${env.CHANGE_TARGET}" // Verify branch exists
+                            changedFiles = sh(returnStdout: true, script: "git diff --name-only origin/${env.CHANGE_TARGET}...HEAD || git diff --name-only HEAD^").trim()
+                        } else {
+                            // For direct commits
+                            changedFiles = sh(returnStdout: true, script: "git diff --name-only HEAD^ HEAD || git diff --name-only HEAD").trim()
+                        }
+                    } catch (Exception e) {
+                        // Fallback to list all files in current commit if diff fails
+                        echo "Failed to get diff, falling back to current commit files: ${e.message}"
+                        changedFiles = sh(returnStdout: true, script: "git diff-tree --no-commit-id --name-only -r HEAD || git ls-files").trim()
                     }
 
-                    affectedServices = changedFiles.findAll { file ->
-                        file.startsWith('spring-petclinic-')
-                    }.collect { file ->
-                        return file.split('/')[0]
-                    }.unique()
+                    if (changedFiles) {
+                        affectedServices = changedFiles.split('\n').findAll { file ->
+                            file.startsWith('spring-petclinic-')
+                        }.collect { file ->
+                            return file.split('/')[0]
+                        }.unique()
 
-                    echo "Affected services: ${affectedServices}"
+                        echo "Affected services: ${affectedServices}"
+                    } else {
+                        echo "No changes detected"
+                        affectedServices = []
+                    }
                 }
             }
-        }
 
         stage('Test affected services') {
             when {

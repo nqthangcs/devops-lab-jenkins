@@ -23,8 +23,10 @@ pipeline {
                     sh 'git fetch --all'
 
                     def changedFiles
-                    if (env.CHANGE_TARGET) {  
-                        changedFiles = sh(returnStdout: true, script: "git diff --name-only origin/${env.CHANGE_TARGET}...${env.GIT_BRANCH}").trim().split('\n')
+                    if (env.CHANGE_TARGET) {
+                        def prBranch = "refs/pull/${env.CHANGE_ID}/head"
+                        echo "Comparing changes in PR from branch ${prBranch} to target ${env.CHANGE_TARGET}"
+                        changedFiles = sh(returnStdout: true, script: "git diff --name-only origin/${env.CHANGE_TARGET}...${prBranch}").trim().split('\n')
                     } else {  
                         changedFiles = sh(returnStdout: true, script: "git diff --name-only HEAD^ HEAD").trim().split('\n')
                     }

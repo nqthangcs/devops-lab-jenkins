@@ -23,7 +23,7 @@ pipeline {
                     def changedFiles
                     if (env.CHANGE_TARGET) {
                         // Ensure the target branch is fetched
-                        sh "git fetch origin ${env.CHANGE_TARGET}:${env.CHANGE_TARGET}"
+                        sh "git fetch origin ${env.CHANGE_TARGET}"
                         
                         changedFiles = sh(returnStdout: true, script: "git diff --name-only origin/${env.CHANGE_TARGET}...HEAD").trim().split('\n')
                     } else {  

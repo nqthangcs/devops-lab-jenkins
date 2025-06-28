@@ -32,4 +32,5 @@ public class VetsServiceApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(VetsServiceApplication.class, args);
 	}
+    
 }

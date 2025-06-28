@@ -25,7 +25,9 @@ pipeline {
                         // Ensure the target branch is fetched
                         sh "git fetch origin ${env.CHANGE_TARGET}"
                         
-                        changedFiles = sh(returnStdout: true, script: "git diff --name-only ${env.CHANGE_TARGET}...HEAD").trim().split('\n')
+                        sh "git checkout -b target_branch FETCH_HEAD"
+                        
+                        changedFiles = sh(returnStdout: true, script: "git diff --name-only target_branch...HEAD").trim().split('\n')
                     } else {  
                         changedFiles = sh(returnStdout: true, script: "git diff --name-only HEAD^ HEAD").trim().split('\n')
                     }
@@ -91,6 +93,8 @@ pipeline {
     post {
         always {
             echo 'Pipeline completed!'
+            sh 'find . -mindepth 1 -exec rm -rf {} +'
+
         }
         success {
             script {
